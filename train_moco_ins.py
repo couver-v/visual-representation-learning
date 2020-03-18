@@ -63,7 +63,7 @@ def parse_option():
     parser.add_argument('--crop', type=float, default=0.2, help='minimum crop')
 
     # dataset
-    parser.add_argument('--dataset', type=str, default='imagenet100', choices=['imagenet100', 'imagenet'])
+    parser.add_argument('--data_folder', type=str, help='path to data folder')
 
     # resume
     parser.add_argument('--resume', default='', type=str, metavar='PATH',
@@ -79,6 +79,7 @@ def parse_option():
 
     # model definition
     parser.add_argument('--model', type=str, default='resnet50', choices=['resnet50', 'resnet50x2', 'resnet50x4'])
+    parser.add_argument('--model_path', type=str, help='path to checkpoint folder')
 
     # loss function
     parser.add_argument('--softmax', action='store_true', help='using softmax contrastive loss rather than NCE')
@@ -93,14 +94,13 @@ def parse_option():
     # GPU setting
     parser.add_argument('--gpu', default=None, type=int, help='GPU id to use.')
 
+    # Tensorboard
+    parser.add_argument('--tb_path', type=str, help='specify where to save tensorboard events')
+
     opt = parser.parse_args()
 
     # set the path according to the environment
-    if hostname.startswith('visiongpu'):
-        opt.data_folder = '/dev/shm/yonglong/{}'.format(opt.dataset)
-        opt.model_path = '/data/vision/phillipi/rep-learn/Pedesis/CMC/{}_models'.format(opt.dataset)
-        opt.tb_path = '/data/vision/phillipi/rep-learn/Pedesis/CMC/{}_tensorboard'.format(opt.dataset)
-    else:
+    if not hostname.startswith('visiongpu'):
         raise NotImplementedError('server invalid: {}'.format(hostname))
 
     if opt.dataset == 'imagenet':
@@ -290,25 +290,6 @@ def main():
         logger.log_value('ins_loss', loss, epoch)
         logger.log_value('ins_prob', prob, epoch)
         logger.log_value('learning_rate', optimizer.param_groups[0]['lr'], epoch)
-
-        # save model
-        if epoch % args.save_freq == 0:
-            print('==> Saving...')
-            state = {
-                'opt': args,
-                'model': model.state_dict(),
-                'contrast': contrast.state_dict(),
-                'optimizer': optimizer.state_dict(),
-                'epoch': epoch,
-            }
-            if args.moco:
-                state['model_ema'] = model_ema.state_dict()
-            if args.amp:
-                state['amp'] = amp.state_dict()
-            save_file = os.path.join(args.model_folder, 'ckpt_epoch_{epoch}.pth'.format(epoch=epoch))
-            torch.save(state, save_file)
-            # help release GPU memory
-            del state
 
         # saving the model
         print('==> Saving...')
