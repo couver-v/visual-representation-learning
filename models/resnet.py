@@ -154,25 +154,39 @@ class ResNet(nn.Module):
     def forward(self, x, layer=7):
         if layer <= 0:
             return x
+        print('conv1:', end=' ')
         x = self.conv1(x)
+        print(x.size())
         x = self.bn1(x)
         x = self.relu(x)
+        print('maxpool:', end=' ')
         x = self.maxpool(x)
+        print(x.size())
         if layer == 1:
             return x
+        print('layer1:', end=' ')
         x = self.layer1(x)
+        print(x.size())
         if layer == 2:
             return x
+        print('layer2:', end=' ')
         x = self.layer2(x)
+        print(x.size())
         if layer == 3:
             return x
+        print('layer3:', end=' ')
         x = self.layer3(x)
+        print(x.size())
         if layer == 4:
             return x
+        print('layer4:', end=' ')
         x = self.layer4(x)
+        print(x.size())
         if layer == 5:
             return x
+        print('avgpool:', end=' ')
         x = self.avgpool(x)
+        print(x.size())
         x = x.view(x.size(0), -1)
         if layer == 6:
             return x
@@ -239,9 +253,9 @@ def resnet152(pretrained=False, **kwargs):
 
 class InsResNet50(nn.Module):
     """Encoder for instance discrimination and MoCo"""
-    def __init__(self, width=1):
+    def __init__(self, width=1, **kwargs):
         super(InsResNet50, self).__init__()
-        self.encoder = resnet50(width=width)
+        self.encoder = resnet50(width=width, **kwargs)
         self.encoder = nn.DataParallel(self.encoder)
 
     def forward(self, x, layer=7):

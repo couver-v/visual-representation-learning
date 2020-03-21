@@ -100,12 +100,12 @@ def parse_option():
     opt = parser.parse_args()
 
     # set the path according to the environment
-    if not hostname.startswith('visiongpu'):
-        raise NotImplementedError('server invalid: {}'.format(hostname))
+    # if not hostname.startswith('visiongpu'):
+    #     raise NotImplementedError('server invalid: {}'.format(hostname))
 
-    if opt.dataset == 'imagenet':
-        if 'alexnet' not in opt.model:
-            opt.crop = 0.08
+    # if opt.dataset == 'imagenet':
+    #     if 'alexnet' not in opt.model:
+    #         opt.crop = 0.08
 
     iterations = opt.lr_decay_epochs.split(',')
     opt.lr_decay_epochs = list([])
@@ -160,7 +160,6 @@ def main():
         print("Use GPU: {} for training".format(args.gpu))
 
     # set the data loader
-    data_folder = os.path.join(args.data_folder, 'train')
 
     image_size = 224
     mean = [0.485, 0.456, 0.406]
@@ -184,9 +183,9 @@ def main():
             normalize,
         ])
     else:
-        raise NotImplemented('augmentation not supported: {}'.format(args.aug))
+        raise NotImplementedError('augmentation not supported: {}'.format(args.aug))
 
-    train_dataset = ImageFolderInstance(data_folder, transform=train_transform, two_crop=args.moco)
+    train_dataset = ImageFolderInstance(args.data_folder, transform=train_transform, two_crop=args.moco)
     print(len(train_dataset))
     train_sampler = None
     train_loader = torch.utils.data.DataLoader(

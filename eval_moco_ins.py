@@ -168,7 +168,7 @@ def main():
             normalize,
         ])
     else:
-        raise NotImplemented('augmentation not supported: {}'.format(args.aug))
+        raise NotImplementedError('augmentation not supported: {}'.format(args.aug))
 
     train_dataset = datasets.ImageFolder(train_folder, train_transform)
     val_dataset = datasets.ImageFolder(

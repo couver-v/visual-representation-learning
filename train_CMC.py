@@ -137,7 +137,7 @@ def get_train_loader(args):
         std = [109.500, 111.855, 111.964]
         color_transfer = RGB2YCbCr()
     else:
-        raise NotImplemented('view not implemented {}'.format(args.view))
+        raise NotImplementedError('view not implemented {}'.format(args.view))
     normalize = transforms.Normalize(mean=mean, std=std)
 
     train_transform = transforms.Compose([
